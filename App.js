@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, TextInput, Button, View } from 'react-native';
 import { useEffect, useState } from 'react';
-import * as SMS from  'app_expo_celke';
+import * as SMS from  'expo-sms';
 
 //expo install expo-sms
 
@@ -23,12 +23,11 @@ export default function App() {
 
 
   const sendSms = async () => {
-    const {result} = await SMS.sendSMSAsync(
-     Recipients,
-     mensagem
-    );
+    const {result} = await SMS.sendSMSAsync(Recipients,"silas");
 
-
+    if (result === "sent"){
+      alert("mensagem enviada com successfully")
+    }
     console.log(result);
   };
 
@@ -52,12 +51,12 @@ export default function App() {
   return (
     <View style={styles.container}>
       <TextInput value={phonenumber} placeholder="Número do celular" onChangeText={(value)=> setphonenumber(value)}/>
-      <Button title='Adicionar contato' onPress={addNumber}/>
+      <Button title='Adicionasr contato' onPress={addNumber}/>
       <TextInput value={mensagem} placeholder="Mensagem" onChangeText={(value) => setmensagem(value)}/>
       <Text>Recipients:</Text>
       {showRecipients()}
       <Button title='Limpar campo de contato' onPress={() => setRecipients([])} />
-      {isAvailable? <Button title="Send SMS" onPress={sendSms} /> : <Text>Nenhum SMS</Text>}
+      <Button title="Enviar SMS" onPress={sendSms} />
       <StatusBar style="auto" />
     </View>
   );
