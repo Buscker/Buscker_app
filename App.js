@@ -1,25 +1,66 @@
 import { StatusBar } from 'expo-status-bar';
 import { View, TouchableOpacity, Image, TextInput, Text } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useState,useRef } from 'react';
 import * as SMS from  'expo-sms';
 import {styles} from './styles';
-
+import MapView, { Marker } from 'react-native-maps';
+import {
+  requestForegroundPermissionsAsync,
+  getCurrentPositionAsync,
+  LocationObject,
+  watchPositionAsync,
+  LocationAccuracy
+} from 'expo-location'
+//expo install expo-sms
 
 
 export default function App() {
+
   const [isAvailable, setIsAvailable] = useState(false);
   const [phonenumber, setphonenumber] = useState(undefined);
   const [Recipients, setRecipients] = useState([]);
   const [mensagem, setmensagem] = useState(undefined);
 
+  const [location,setLocation] = useState(LocationObject);
+  const mapRef = useRef(MapView);
 
+  async function requestlocationPermissions(){
+    const {granted} = await requestForegroundPermissionsAsync();
+    const currentposition = await getCurrentPositionAsync();
+    setLocation(currentposition)
+
+    if( granted) {
+      console.log("Localização atual: ",currentposition);
+    }
+    
+  }
+
+
+    // renderizar interface
   useEffect(() => {
+    requestlocationPermissions();
     async function checkAvailability() {
       const isSmsAvailable = await SMS.isAvailableAsync();
       setIsAvailable(isSmsAvailable);
     }
     checkAvailability();
   }, []);
+
+  useEffect(() =>{
+    watchPositionAsync({
+      accuracy:LocationAccuracy.Highest,
+      timeInterval: 1000,
+      distanceInterval: 1
+    }, (response) => {
+      //console.log("Nova localização!", response);
+      setLocation(response);
+      
+      //mapRef.current?.animateCamera({
+        
+        //center: response.coords
+      //})
+    })
+  },[]);
 
 
   const sendSms = async () => {
@@ -88,6 +129,30 @@ export default function App() {
               source={require('./assets/buttons/sendmessage.png')}
             />
           </TouchableOpacity>
+
+          {
+        location &&
+        <MapView 
+       
+          style={styles.map}
+          initialRegion={{
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005
+          }}
+      
+        >
+          <Marker coordinate={{
+            latitude:location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005
+          }}/>
+
+
+        </MapView>
+      }
       <StatusBar style="auto" />
     </View>
   );
