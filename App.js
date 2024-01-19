@@ -1,9 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TextInput, Button, View } from 'react-native';
+import { View, TouchableOpacity, Image, TextInput, Text } from 'react-native';
 import { useEffect, useState } from 'react';
 import * as SMS from  'expo-sms';
+import {styles} from './styles';
 
-//expo install expo-sms
 
 
 export default function App() {
@@ -23,10 +23,10 @@ export default function App() {
 
 
   const sendSms = async () => {
-    const {result} = await SMS.sendSMSAsync(Recipients,"silas");
+    const {result} = await SMS.sendSMSAsync(Recipients,"Seja bem vind@ ao Buscker!");
 
     if (result === "sent"){
-      alert("mensagem enviada com successfully")
+      alert("mensagem enviada com successo")
     }
     console.log(result);
   };
@@ -50,26 +50,51 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+    
+      
+      <Image
+        source={require('./assets/buttons/buscker.png')}
+      />
+
       <TextInput value={phonenumber} placeholder="Número do celular" onChangeText={(value)=> setphonenumber(value)}/>
-      <Button title='Adicionasr contato' onPress={addNumber}/>
+        <TouchableOpacity
+        onPress={addNumber}
+            activeOpacity={0.5}>
+            <Image
+              source={require('./assets/buttons/addcontact.png')}
+            />
+          </TouchableOpacity>
+
+
       <TextInput value={mensagem} placeholder="Mensagem" onChangeText={(value) => setmensagem(value)}/>
       <Text>Recipients:</Text>
       {showRecipients()}
-      <Button title='Limpar campo de contato' onPress={() => setRecipients([])} />
-      <Button title="Enviar SMS" onPress={sendSms} />
+
+
+      <TouchableOpacity
+         onPress={() => setRecipients([])}
+            activeOpacity={0.5}>
+            <Image
+              source={require('./assets/buttons/deletebutton.png')}
+            />
+          </TouchableOpacity>
+
+
+      
+      <TouchableOpacity
+         onPress={sendSms}
+            activeOpacity={0.5}>
+            <Image
+              source={require('./assets/buttons/sendmessage.png')}
+            />
+          </TouchableOpacity>
       <StatusBar style="auto" />
     </View>
   );
+
+
 }
 
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 
 
